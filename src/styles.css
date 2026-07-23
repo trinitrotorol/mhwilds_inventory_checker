@@ -1,0 +1,223 @@
+:root {
+  color: #f6f1dd;
+  background: #07100d;
+  font-family:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-width: 320px;
+  background: #07100d;
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+  overflow-x: hidden;
+  background:
+    radial-gradient(circle at 82% 8%, rgb(189 151 63 / 18%), transparent 27rem),
+    radial-gradient(circle at 12% 70%, rgb(28 101 69 / 24%), transparent 34rem),
+    linear-gradient(145deg, #0b1914 0%, #07100d 58%, #050a08 100%);
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+.page-shell {
+  width: min(100% - 2rem, 72rem);
+  min-height: 100vh;
+  margin-inline: auto;
+  padding-block: clamp(2rem, 7vw, 5.5rem) 2rem;
+}
+
+.hero {
+  position: relative;
+  max-width: 52rem;
+  padding: clamp(1.5rem, 5vw, 4rem);
+  overflow: hidden;
+  border: 1px solid rgb(216 182 97 / 40%);
+  border-radius: 1.25rem 1.25rem 0.35rem 1.25rem;
+  background:
+    linear-gradient(120deg, rgb(16 47 34 / 94%), rgb(8 27 20 / 96%)),
+    #0d2a1e;
+  box-shadow:
+    0 1.5rem 4rem rgb(0 0 0 / 38%),
+    inset 0 1px rgb(255 255 255 / 5%);
+}
+
+.hero::after {
+  position: absolute;
+  right: -3.5rem;
+  bottom: -5.5rem;
+  width: 15rem;
+  height: 15rem;
+  border: 1px solid rgb(224 191 100 / 26%);
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 1.4rem rgb(224 191 100 / 5%),
+    0 0 0 3rem rgb(224 191 100 / 3%);
+  content: "";
+}
+
+.eyebrow,
+.section-kicker {
+  margin: 0 0 0.75rem;
+  color: #d8b661;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+}
+
+h1,
+h2,
+h3,
+p {
+  overflow-wrap: anywhere;
+}
+
+h1 {
+  max-width: 16ch;
+  margin: 0;
+  color: #fffaf0;
+  font-size: clamp(2.25rem, 8vw, 5.25rem);
+  line-height: 0.98;
+  letter-spacing: -0.045em;
+}
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin: 1.5rem 0 0;
+  padding: 0.5rem 0.8rem;
+  border: 1px solid rgb(226 195 111 / 54%);
+  border-radius: 999px;
+  color: #ffe5a0;
+  background: rgb(53 42 13 / 46%);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.status::before {
+  width: 0.48rem;
+  height: 0.48rem;
+  border-radius: 50%;
+  background: #e2c36f;
+  box-shadow: 0 0 0 0.22rem rgb(226 195 111 / 14%);
+  content: "";
+}
+
+.lead {
+  position: relative;
+  z-index: 1;
+  max-width: 38rem;
+  margin: 1.5rem 0 0;
+  color: #d9e2dc;
+  font-size: clamp(1rem, 2.4vw, 1.18rem);
+  line-height: 1.8;
+}
+
+.scope {
+  display: grid;
+  grid-template-columns: minmax(0, 0.75fr) minmax(0, 1.25fr);
+  gap: clamp(1.5rem, 5vw, 4rem);
+  margin-top: clamp(2.5rem, 7vw, 5rem);
+  padding-inline: clamp(0rem, 3vw, 2rem);
+}
+
+.section-heading h2 {
+  margin: 0;
+  color: #f8f1dc;
+  font-size: clamp(1.65rem, 4vw, 2.4rem);
+  line-height: 1.15;
+}
+
+.inventory-types {
+  display: grid;
+  gap: 0;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.inventory-types li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 1rem;
+  padding: 1.1rem 0;
+  border-top: 1px solid rgb(203 219 210 / 16%);
+}
+
+.inventory-types li:last-child {
+  border-bottom: 1px solid rgb(203 219 210 / 16%);
+}
+
+.inventory-type-marker {
+  width: 0.7rem;
+  height: 0.7rem;
+  margin-top: 0.4rem;
+  border: 1px solid #d8b661;
+  rotate: 45deg;
+  background: rgb(216 182 97 / 12%);
+}
+
+.inventory-types h3 {
+  margin: 0;
+  color: #f5ecd4;
+  font-size: 1.05rem;
+}
+
+.inventory-types p {
+  margin: 0.35rem 0 0;
+  color: #aebdb5;
+  font-size: 0.94rem;
+  line-height: 1.65;
+}
+
+.privacy-note {
+  max-width: 52rem;
+  margin: clamp(2.5rem, 7vw, 5rem) 0 0;
+  padding-left: 1rem;
+  border-left: 2px solid #4b8c69;
+  color: #aebdb5;
+  font-size: 0.86rem;
+  line-height: 1.7;
+}
+
+@media (max-width: 44rem) {
+  .page-shell {
+    width: min(100% - 1.25rem, 72rem);
+    padding-top: 1rem;
+  }
+
+  .hero {
+    padding: 1.5rem;
+  }
+
+  .scope {
+    grid-template-columns: minmax(0, 1fr);
+    padding-inline: 0.5rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+  }
+}

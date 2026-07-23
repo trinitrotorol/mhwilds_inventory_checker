@@ -1,0 +1,29 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Bootstrap repository-local Node.js
+        run: ./scripts/bootstrap.sh
+
+      - name: Install locked dependencies
+        run: ./scripts/npmw ci
+
+      - name: Verify
+        run: ./scripts/npmw run verify

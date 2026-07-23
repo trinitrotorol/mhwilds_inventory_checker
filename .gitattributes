@@ -1,0 +1,6 @@
+* text=auto
+*.sh text eol=lf
+scripts/nodew text eol=lf
+scripts/npmw text eol=lf
+.node-version text eol=lf
+requirements-toolchain.txt text eol=lf
