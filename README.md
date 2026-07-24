@@ -90,4 +90,12 @@ TypeScript build metadata、browser 生成物は commit しません。
 参照時点と採否は [docs/reference-baseline.md](docs/reference-baseline.md) に
 記録しています。これはゲームデータや契約の正本ではありません。
 
+## 将来の統合
+
+このリポジトリは、単独で build と test ができる状態を維持します。
+構成が安定した後は、`mhwilds_skill_sim` 側からこのリポジトリの特定の
+commit または release tag を Git submodule として固定参照する予定です。
+このリポジトリ側へ `mhwilds_skill_sim` を Git submodule として追加することは
+ありません。
+
 commit message は [COMMIT_CONVENTION.md](COMMIT_CONVENTION.md) に従います。
