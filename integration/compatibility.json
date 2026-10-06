@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "inventory_profile_schema": "contracts/inventory-profile.v1.schema.json",
+  "checker_catalog_schema": "contracts/checker-catalog.v1.schema.json",
+  "search_inventory_schema": "contracts/search-inventory.v1.schema.json",
+  "storage_key": "mhwilds.inventory.profile.v1",
+  "domain_entrypoint": "src/domain/index.ts",
+  "storage_entrypoint": "src/storage/index.ts",
+  "catalog_url": "/game-guide/mhwilds-skill-sim/catalog/checker-catalog.json",
+  "supported_versions": { "inventory_profile": [1], "checker_catalog": [1], "search_inventory": [1] },
+  "compatibility_policy": "The parent pins this repository SHA. Release manifests identify the tested parent, checker and immutable catalog revisions. Unknown schema versions are rejected, never migrated implicitly."
+}

@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://trinitrotorol.com/contracts/checker-catalog.v1.schema.json",
+  "title": "MHWILDS checker catalog v1",
+  "description": "Derived from the solver canonical catalog. Runtime validation additionally checks unique IDs, reference integrity, rank order, rank thresholds and appraisal slot order.",
+  "type": "object", "additionalProperties": false,
+  "required": ["schema_version", "revision", "generated_at", "skills", "decorations", "fixed_charms", "appraisal_charm_skill_groups", "appraisal_charm_patterns"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "revision": { "$ref": "#/$defs/id" },
+    "generated_at": { "$ref": "#/$defs/timestamp" },
+    "skills": { "type": "array", "minItems": 1, "maxItems": 20000, "items": { "$ref": "#/$defs/skill" } },
+    "decorations": { "type": "array", "minItems": 1, "maxItems": 20000, "items": { "$ref": "#/$defs/decoration" } },
+    "fixed_charms": { "type": "array", "minItems": 1, "maxItems": 20000, "items": { "$ref": "#/$defs/fixedCharm" } },
+    "appraisal_charm_skill_groups": { "type": "array", "maxItems": 20000, "items": { "$ref": "#/$defs/appraisalGroup" } },
+    "appraisal_charm_patterns": { "type": "array", "maxItems": 20000, "items": { "$ref": "#/$defs/appraisalPattern" } }
+  },
+  "$defs": {
+    "id": { "type": "string", "minLength": 1, "maxLength": 512, "pattern": "^\\S(?:[\\s\\S]*\\S)?$" },
+    "name": { "anyOf": [{ "$ref": "#/$defs/id" }, { "type": "null" }] },
+    "timestamp": { "type": "string", "format": "date-time", "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{3})?Z$" },
+    "positiveInteger": { "type": "integer", "minimum": 1, "maximum": 9007199254740991 },
+    "slot": {
+      "type": "object", "additionalProperties": false, "required": ["kind", "level"],
+      "properties": { "kind": { "enum": ["weapon", "armor"] }, "level": { "$ref": "#/$defs/positiveInteger" } }
+    },
+    "skillLevel": {
+      "type": "object", "additionalProperties": false, "required": ["skill_id", "level"],
+      "properties": { "skill_id": { "$ref": "#/$defs/id" }, "level": { "$ref": "#/$defs/positiveInteger" } }
+    },
+    "skill": {
+      "type": "object", "additionalProperties": false, "required": ["skill_id", "display_name", "kind", "ranks"],
+      "properties": {
+        "skill_id": { "$ref": "#/$defs/id" }, "display_name": { "$ref": "#/$defs/name" },
+        "kind": { "enum": ["weapon", "armor", "set", "group"] },
+        "ranks": { "type": "array", "minItems": 1, "maxItems": 100, "items": {
+          "type": "object", "additionalProperties": false, "required": ["level", "required_pieces"],
+          "properties": { "level": { "$ref": "#/$defs/positiveInteger" }, "required_pieces": { "anyOf": [{ "$ref": "#/$defs/positiveInteger" }, { "type": "null" }] } }
+        } }
+      }
+    },
+    "decoration": {
+      "type": "object", "additionalProperties": false, "required": ["decoration_id", "display_name", "required_slot", "skills"],
+      "properties": {
+        "decoration_id": { "$ref": "#/$defs/id" }, "display_name": { "$ref": "#/$defs/name" }, "required_slot": { "$ref": "#/$defs/slot" },
+        "skills": { "type": "array", "minItems": 1, "maxItems": 100, "items": { "$ref": "#/$defs/skillLevel" } }
+      }
+    },
+    "fixedCharm": {
+      "type": "object", "additionalProperties": false, "required": ["equipment_id", "display_name", "slots", "skills"],
+      "properties": {
+        "equipment_id": { "$ref": "#/$defs/id" }, "display_name": { "$ref": "#/$defs/name" },
+        "slots": { "type": "array", "maxItems": 4, "items": { "$ref": "#/$defs/slot" } },
+        "skills": { "type": "array", "maxItems": 100, "items": { "$ref": "#/$defs/skillLevel" } }
+      }
+    },
+    "appraisalGroup": {
+      "type": "object", "additionalProperties": false, "required": ["group_id", "skills"],
+      "properties": { "group_id": { "$ref": "#/$defs/id" }, "skills": { "type": "array", "minItems": 1, "maxItems": 20000, "items": { "$ref": "#/$defs/skillLevel" } } }
+    },
+    "appraisalPattern": {
+      "type": "object", "additionalProperties": false, "required": ["pattern_id", "rarity", "skill_group_ids", "slots"],
+      "properties": {
+        "pattern_id": { "$ref": "#/$defs/id" }, "rarity": { "$ref": "#/$defs/positiveInteger" },
+        "skill_group_ids": { "type": "array", "minItems": 1, "maxItems": 3, "items": { "$ref": "#/$defs/id" } },
+        "slots": { "type": "array", "maxItems": 4, "items": { "$ref": "#/$defs/slot" } }
+      }
+    }
+  }
+}
