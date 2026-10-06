@@ -66,6 +66,43 @@ describe('Inventory checker', () => {
     expect(store.read().profile?.appraisal_charms).toEqual(syntheticProfile().appraisal_charms)
   })
 
+  it.each([
+    { category: '装飾品', name: '試験攻撃珠', kind: 'decorations' as const },
+    { category: '固定護石', name: '試験護石', kind: 'fixed_charms' as const },
+  ])('preserves a newer external $category quantity while retaining the dirty input', async ({ category, name, kind }) => {
+    const { store } = setup()
+    await loaded()
+    fireEvent.click(screen.getByRole('button', { name: category }))
+    const input = screen.getByRole('textbox', { name: `${name}の所持数` })
+    act(() => input.focus())
+    fireEvent.change(input, { target: { value: '8' } })
+    const external = syntheticProfile()
+    external[kind][0]!.quantity = 5
+    const raw = exportProfile(external)
+    // The storage event updates the hook's CAS base before the dirty editor
+    // rerenders. Blurring within this turn must still use the edit-start revision.
+    act(() => {
+      const oldValue = localStorage.getItem(INVENTORY_STORAGE_KEY)
+      localStorage.setItem(INVENTORY_STORAGE_KEY, raw)
+      window.dispatchEvent(new StorageEvent('storage', { key: INVENTORY_STORAGE_KEY, oldValue, newValue: raw, storageArea: localStorage }))
+      fireEvent.blur(input)
+    })
+    expect(store.read().raw).toBe(raw)
+    expect(store.read().profile?.[kind][0]?.quantity).toBe(5)
+    expect(input).toHaveValue('8')
+    expect(screen.getByText(/最新の保存値は5個/)).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: `${name}を1個増やす` })).toBeDisabled()
+    fireEvent.keyDown(input, { key: 'Enter' })
+    expect(store.read().raw).toBe(raw)
+    fireEvent.click(screen.getByRole('button', { name: `${name}の入力を最新の保存値に戻す` }))
+    expect(input).toHaveValue('5')
+    fireEvent.change(input, { target: { value: '6' } })
+    fireEvent.blur(input)
+    await saved()
+    expect(store.read().profile?.[kind][0]?.quantity).toBe(6)
+    expect(store.read().profile?.appraisal_charms).toEqual(external.appraisal_charms)
+  })
+
   it('creates a pattern-valid appraisal and edits, clones, cancels deletion and deletes it', async () => {
     const { store } = setup()
     await loaded()
