@@ -7,7 +7,7 @@ gitlink and combined build can publish this service. Remote compute is disabled.
 | Check | Result |
 | --- | --- |
 | Parent make test / lint / data-check | lint and data-check PASS; full regression rerun in progress |
-| Checker verify | 9 files / 78 tests PASS; lint, TypeScript and production build PASS |
+| Checker verify | 9 files / 80 tests PASS; lint, TypeScript and production build PASS |
 | Integrated browser-only / owned flow | NOT_RUN |
 | Independent review | domain/schema/source provenance and integration reviewed; fixes have regression tests |
 | Clean tracked build and fixed child SHA | NOT_RUN |

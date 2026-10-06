@@ -4,9 +4,9 @@ import { QuantityEditor } from './QuantityEditor'
 
 describe('QuantityEditor', () => {
   it('preserves quantities greater than one and rejects invalid drafts', () => {
-    const change = vi.fn()
+    const change = vi.fn(() => true)
     const adjust = vi.fn()
-    render(<QuantityEditor name="検証護石" value={4} onChange={change} onAdjust={adjust} />)
+    render(<QuantityEditor name="検証護石" value={4} revision={0} onChange={change} onAdjust={adjust} />)
     const input = screen.getByRole('textbox', { name: '検証護石の所持数' })
     expect(input).toHaveValue('4')
     for (const value of ['', '-1', '1.2', '9007199254740992']) {
@@ -17,7 +17,7 @@ describe('QuantityEditor', () => {
     expect(input).toHaveAttribute('aria-invalid', 'true')
     fireEvent.change(input, { target: { value: '8' } })
     fireEvent.blur(input)
-    expect(change).toHaveBeenCalledWith(8)
+    expect(change).toHaveBeenCalledWith(8, 0)
     fireEvent.click(screen.getByRole('button', { name: '検証護石を1個増やす' }))
     expect(adjust).toHaveBeenCalledWith(1)
   })
