@@ -10,7 +10,10 @@ export default defineConfig(({ mode }) => {
   return {
     base: resolveBasePath(environment.VITE_BASE_PATH),
     plugins: [react()],
-    test: {
+  test: {
+    isolate: process.env.VITEST_REUSE_ENV !== '1',
+      maxWorkers: 1,
+      pool: 'threads',
       environment: 'jsdom',
       setupFiles: './src/test/setup.ts',
       include: ['src/**/*.{test,spec}.{ts,tsx}', 'config/**/*.{test,spec}.ts'],

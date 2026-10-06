@@ -2,6 +2,20 @@
 
 ## Scope
 
+### Service completion scope (2026-10-06)
+
+The current end-to-end service request supersedes the historical scope and
+no-merge restrictions below. Changes to both `mhwilds_inventory_checker` and
+`mhwilds_skill_sim`, real upstream catalog export, parent-to-checker submodule
+integration, normal validated commits/pushes/merges and no-additional-cost
+deployment are authorized. Use isolated checkouts and preserve concurrent work.
+Do not enable paid infrastructure, rewrite history, bypass required checks,
+expose secrets, or modify unrelated repositories/services. The checker remains
+independently buildable and never depends on the parent. Environment isolation,
+validation and commit conventions below remain applicable.
+
+### Historical scaffold scope (superseded for service completion)
+
 - Change only this `mhwilds_inventory_checker` repository.
 - Treat `trinitrotorol/mhwilds_skill_sim` as read-only reference material.
 - Never create commits, branches, pull requests, or configuration changes in

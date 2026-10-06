@@ -1,101 +1,128 @@
 # MHWILDS 所持品チェッカー
 
-MHWILDS の装備品や固定護石・鑑定護石について、所持状況をブラウザ内で
-整理するための静的 Web アプリです。現在は React、TypeScript、Vite による
-開発基盤と準備中画面だけを提供しています。
+装飾品・固定護石・鑑定護石を日本語で検索・登録する静的Webアプリです。
+所持情報はこの端末のブラウザ内に保存します。同じオリジンのスキルシミュレーターと
+`mhwilds.inventory.profile.v1` を共有します。アカウント、クラウド同期、
+テレメトリーはありません。実際の公開状況と検証結果は `docs/service/` を参照してください。
 
-## 目的
+## 利用方法
 
-- 検証可能な静的 Web アプリの基盤を用意する
-- 所持情報を将来ブラウザ内だけに保存できる構成にする
-- レビュー済みの契約を通じて、将来ゲームカタログを参照できるようにする
+画面は[デジタル庁デザインシステム](https://design.digital.go.jp/dads/)を参考に、
+読みやすい文字、青を基調とした操作、明確なフォーカスと入力エラーを備えています。
+参照元と採用方針は [UIデザイン方針](docs/service/ui-design.md) に記録しています。
 
-## 対象外
+1. 装飾品または固定護石のタブで、名称・ID・スキル名を検索します。
+   所持・未所持やスロットで絞り込めます。名称がない項目は安定IDで表示します。
+2. `＋`・`−` または直接入力で所持数を設定します。直接入力は Enter または
+   入力欄から移動した時に確定します。空欄、負数、小数、安全な整数を超える値は
+   保存しません。0個は未所持です。固定護石も2個以上の所持数を保持します。
+3. 鑑定護石は「鑑定護石を登録」から、日本語のスキル・レベル・レア度・
+   武器/防具スロットを入力します。「ルールから入力を開始」でパターンを選び、
+   実際の能力に編集できます。取得済みルールに一致した内容だけ新規保存できます。
+   複数パターンに一致する能力も有効です。編集・複製・削除に対応します。
+4. 上部のリンクからスキルシミュレーターへ移動し、「所持品を考慮する」を
+   選びます。同じオリジン・ブラウザの保存領域が使われ、再入力は不要です。
 
-- アカウント、サーバー DB、Cookie、テレメトリー
-- 実ゲームデータをこのリポジトリの正本として複製すること
-- `mhwilds_skill_sim` の依存関係化、clone、fetch、submodule 化
-- 現段階での Cloudflare 公開やデプロイ
+スキルシミュレーターのブラウザ計算は端末内で実行されます。サーバー計算を利用する
+場合だけ、検索に必要な最小制約が送信されます。計算エンジンと送信範囲は
+シミュレーター側の案内を確認してください。
+
+## 保存とバックアップ
+
+画面右上に「保存中」「保存済み」「未保存」「保存競合」を表示します。
+保存済みの情報は再読込み後も復元されます。別のタブの変更も検知します。
+Web Locks が利用できるブラウザでは保存処理を共有ロックで直列化します。
+未対応環境は同一タブ内の直列化と保存直前の比較を行いますが、複数タブ間の
+完全なトランザクションは保証しません。大量編集はひとつのタブで行ってください。
+
+所持情報は端末・ブラウザ・オリジンごとに独立します。プライベートモードの終了、
+ブラウザデータの削除、端末の故障で失われる場合があります。
+「JSONをダウンロード」から定期的にバックアップしてください。
+UTF-8の整形済みJSONで、保存形式と日時を含むファイル名になります。
+
+「JSONから復元」では保存前に件数・日時・変更件数・不明ID・競合を確認します。
+
+- **統合**: 装飾品・固定護石は同じIDの数量の大きい方を採用します。加算しません。
+  鑑定護石は同じ個体IDかつ同能力なら数量の大きい方を採用します。同じバックアップを
+  繰り返しても数量は増えません。同じ個体IDで異なる能力がある場合は統合を中止します。
+- **置換**: 現在の登録内容をバックアップ全体で置き換えます。
+- **キャンセル**: 保存情報を変更しません。確認中に別の更新が入った場合は、
+  古いプレビューや護石編集からの保存を拒否します。閉じてやり直してください。
+
+バックアップは4 MiB、深さ・件数等の防御上限で検証します。これらはゲーム内の
+所持上限ではありません。未知の保存形式を勝手に変換しません。
+
+## エラーやデータ更新時
+
+- **保存失敗・容量不足**: 未保存の変更を画面に保持します。まずJSONを退避し、
+  保存領域の設定や容量を確認します。「最新の保存データを読み込む」は未保存変更を
+  破棄するため確認画面を表示します。
+- **保存競合**: 画面の内容をJSONで退避してから最新データを読込み、必要なJSONを統合します。
+- **破損・未対応形式**: 元データを自動削除・上書きしません。「元の保存データを退避」で
+  原文をダウンロードできます。確認済みJSONからの復旧や初期化では元データの復旧用コピーを
+  保存領域に残します。通常のJSON出力に破損原文は混ぜません。
+- **カタログ更新**: カタログ版の違い、不明ID、検証できない護石を表示します。
+  所持情報を削除せず保持します。内容確認後「カタログ参照を更新」で現在版に関連付けます。
+  現在のルールで無効・検証不能の個体は検索で利用できない場合があります。
+- **カタログ取得失敗**: 再試行できます。同じ画面で直前の正常データを取得済みなら
+  古い版であることを明示して利用します。本番で架空のテストデータへ切り替えません。
+
+装飾品・固定護石のみ有限の収集状況を表示します。鑑定護石は登録個体数と合計数量を
+表示し、根拠のない全種類コンプリート率は表示しません。
+
+## カタログと契約
+
+ゲームデータの正本は親 `mhwilds_skill_sim` です。同じ正規化データから生成された
+`/game-guide/mhwilds-skill-sim/catalog/checker-catalog.json` を同一オリジンで取得します。
+カタログはスキーマ・参照・重複・サイズ・URL・Content-Typeを検証します。
+カタログ全体を所持情報へ保存しません。型だけのassertionで未知入力を通しません。
+
+- `contracts/checker-catalog.v1.schema.json`
+- `contracts/inventory-profile.v1.schema.json`
+- `integration/compatibility.json`
+- `src/domain/index.ts`: React/DOMに依存しない型・検証・正規化・バックアップ契約
+- `src/storage/index.ts`: ブラウザ保存・同一タブ通知・別タブ通知・競合・復旧
+- `src/catalog/index.ts`: 同一オリジンの静的カタログ読込み
+
+親はこのリポジトリの検証済み固定SHAをsubmoduleで参照します。子のmainへのpushだけでは
+親のgitlinkや公開サービスは更新されません。子へ親のpackage依存やsubmoduleは追加しません。
 
 ## リポジトリ内ツールチェーン
 
-Node.js は `24.18.0`、npm は `11.16.0` に固定しています。2026-07-24
-時点でサポート中の LTS であり、Vite 8 と ESLint 10 の runtime 条件を
-満たすためです。Node.js や npm の system installation、nvm、fnm、Volta、
-global pip/npm は使用しません。
-
-bootstrap は POSIX の system Python 3.10 以上からリポジトリ直下に `.venv`
-を作成します。hash 固定した `nodeenv 1.10.0` をその仮想環境へ導入し、
-`nodeenv --python-virtualenv` で固定版 Node.js/npm を同じ `.venv` に
-インストールします。pip の bootstrap wheel と Node.js 公式 archive は、
-固定 SHA-256 を検証したものだけを使用します。対応環境は Linux/WSL の
-x64 と arm64 です。
-
-Windows では PowerShell や native Python ではなく WSL から実行してください。
-native Windows の Python 仮想環境は `.venv/Scripts` となり、このリポジトリが
-要求する `.venv/bin` レイアウトを満たしません。shell の activate や rc の変更は
-不要です。
+Linux/WSLの既存Pythonから、固定Node.js/npmのrepo-local環境を作ります。
+system Node/npm、global install、HOMEのtoolchain/cacheは使用しません。
+Node.js `24.18.0`、npm `11.16.0`、hash固定のnodeenvを使用します。
 
 ```sh
 ./scripts/bootstrap.sh
 ./scripts/npmw ci
+./scripts/npmw run verify
 ```
 
-`scripts/nodew` と `scripts/npmw` は、それぞれ `.venv/bin/node` と
-`.venv/bin/npm` を直接実行します。system Node/npm への fallback はありません。
-pip、npm、一時ファイル、XDG、Corepack、Playwright の可変データはすべて
-リポジトリ内の `.cache/` に限定されます。
-
-## 開発
+WindowsではWSLから実行します。`.venv/bin` とrepo内cacheの分離が必要です。
+bootstrapは公式Node.js archiveのSHA-256を確認します。wrapperはrepo-local実行ファイルを
+直接実行し、cache・一時ファイル・XDG・ブラウザ関連データを `.cache/` に限定します。
 
 ```sh
-./scripts/npmw run dev
-```
-
-既定の公開 base path は `/game-guide/mhwilds-inventory-checker/` です。将来の
-公開先を検証するときだけ、同一 origin の絶対 path を build 時に上書きできます。
-
-```sh
-VITE_BASE_PATH=/preview/inventory/ ./scripts/npmw run build
-```
-
-値は先頭と末尾が `/` である必要があり、URL、query、fragment、
-バックスラッシュ、制御文字は受け付けません。
-
-## 検証
-
-```sh
+./scripts/npmw run dev -- --host 127.0.0.1
 ./scripts/npmw run test
 ./scripts/npmw run lint
 ./scripts/npmw run typecheck
 ./scripts/npmw run build
-./scripts/npmw run verify
 ```
 
-`verify` は unit test、lint、typecheck、production build の順で実行します。
-標準の再現検証は `bootstrap.sh`、`npmw ci`、`npmw run verify` の順です。
+`verify` はunit/component test、lint、型検証、本番buildを実行します。
+WSLのWindows側ファイルシステムでテスト環境の起動がタイムアウトする場合は、
+`VITEST_REUSE_ENV=1 ./scripts/npmw run verify` で同じ全テストを環境再利用で実行できます。
+通常実行とCIでは各テストファイルを分離します。
+test fixtureは `src/test/` に限り、本番へのimportを禁止します。
+実カタログ・統合browser・公開URLの検証は親のサービス検証手順を参照してください。
 
-## 生成物
+公開base pathは `/game-guide/mhwilds-inventory-checker/` です。
+`VITE_BASE_PATH=/preview/inventory/ ./scripts/npmw run build` で同一オリジンの絶対pathに
+変更できます。先頭・末尾は `/`、URL/query/fragment/バックスラッシュ/制御文字は禁止です。
+シミュレーターとカタログの既定パスはサービス標準のままです。
 
 `.venv/`、`.cache/`、`node_modules/`、`dist/`、`coverage/`、`.build/`、
-TypeScript build metadata、browser 生成物は commit しません。
-
-## 参照リポジトリ
-
-`trinitrotorol/mhwilds_skill_sim` は公開 GitHub の HTTPS read-only 情報と
-`git ls-remote` だけで参照します。clone、shallow clone、fetch、submodule、
-書き込みは行いません。必要な一時参照ファイルは
-`.cache/reference-files/` にだけ保存します。
-
-参照時点と採否は [docs/reference-baseline.md](docs/reference-baseline.md) に
-記録しています。これはゲームデータや契約の正本ではありません。
-
-## 将来の統合
-
-このリポジトリは、単独で build と test ができる状態を維持します。
-構成が安定した後は、`mhwilds_skill_sim` 側からこのリポジトリの特定の
-commit または release tag を Git submodule として固定参照する予定です。
-このリポジトリ側へ `mhwilds_skill_sim` を Git submodule として追加することは
-ありません。
-
-commit message は [COMMIT_CONVENTION.md](COMMIT_CONVENTION.md) に従います。
+ブラウザ生成物、ユーザーデータ、秘密情報はcommitしません。
+commitは [COMMIT_CONVENTION.md](COMMIT_CONVENTION.md) に従います。
