@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { backupFilename, createProfile, exportProfile, inspectProfile, MAX_PROFILE_BYTES, previewImport, validateAppraisalCharm } from './domain'
 import { createCatalogLoader } from './catalog'
+import { serviceRoutes } from './routes'
 import { createInventoryStore } from './storage'
 import type { AppraisalCharm, CheckerCatalog } from './domain'
 import { AppraisalEditor } from './components/AppraisalEditor'
@@ -27,7 +28,8 @@ function FilterBar({ category, filters, onChange }: { category: 'decorations' | 
 
 export function App({ store: providedStore, catalogLoader: providedLoader }: { store?: InventoryStore; catalogLoader?: CatalogLoader } = {}) {
   const [store] = useState(() => providedStore ?? createInventoryStore())
-  const [loader] = useState(() => providedLoader ?? createCatalogLoader({ url: '/game-guide/mhwilds-skill-sim/catalog/checker-catalog.json' }))
+  const [loader] = useState(() => providedLoader ?? createCatalogLoader())
+  const routes = serviceRoutes()
   const [catalogResult, setCatalogResult] = useState<Awaited<ReturnType<CatalogLoader['load']>> | null>(null)
   const [loading, setLoading] = useState(true)
   const [reloadCatalog, setReloadCatalog] = useState(0)
@@ -96,7 +98,7 @@ export function App({ store: providedStore, catalogLoader: providedLoader }: { s
 
   return <>
     <a className="skip-link" href="#inventory-content">所持品の入力へ移動</a>
-    <header className="site-header"><a className="brand" href="/game-guide/mhwilds-inventory-checker/" aria-label="MHWILDS 所持品チェッカー ホーム"><span aria-hidden="true" className="brand-mark">◇</span><span>MHWILDS<small>INVENTORY CHECKER</small></span></a><a className="sim-link" href="/game-guide/mhwilds-skill-sim/">スキルシミュレーター <span aria-hidden="true">↗</span></a></header>
+    <header className="site-header"><a className="brand" href={routes.checker} aria-label="MHWILDS 所持品チェッカー ホーム"><span aria-hidden="true" className="brand-mark">◇</span><span>MHWILDS<small>INVENTORY CHECKER</small></span></a><a className="sim-link" href={routes.simulator}>スキルシミュレーター <span aria-hidden="true">↗</span></a></header>
     <main className="page-shell">
       <section className="hero" aria-labelledby="page-title"><div><p className="eyebrow">MY EQUIPMENT COLLECTION</p><h1 id="page-title">所持品チェッカー</h1><p className="lead">手持ちを整えて、装備探しをもっと身近に。</p><p className="muted">装飾品と護石を登録すると、同じブラウザのスキルシミュレーターで所持情報を利用できます。</p></div><div className="save-status" role="status"><span className={`status-dot ${inventory.saveState === 'saved' ? '' : 'attention'}`} aria-hidden="true" />{inventory.saveState === 'saving' ? '保存中…' : inventory.saveState === 'conflict' ? '保存競合・未保存' : inventory.saveState === 'unsaved' ? '未保存の変更あり' : inventory.loaded.status === 'corrupt' ? '保存データを確認してください' : inventory.loaded.status === 'unavailable' ? '保存領域を利用できません' : inventory.profile ? 'このブラウザに保存済み' : 'まだ登録されていません'}</div></section>
       {inventory.error && <div className="notice warning" role="alert"><p>{inventory.error}</p><button onClick={() => setDialog({ kind: 'reload', revision: inventory.revision })} disabled={inventory.saveState === 'saving'}>最新の保存データを読み込む</button></div>}

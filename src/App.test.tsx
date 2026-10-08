@@ -1,5 +1,5 @@
 import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { App } from './App'
 import { exportProfile } from './domain'
 import { createInventoryStore, INVENTORY_STORAGE_KEY } from './storage'
@@ -21,8 +21,28 @@ function backupFile(raw: string) {
 }
 
 beforeEach(() => { localStorage.clear() })
+afterEach(() => { history.replaceState(null, '', '/'); vi.unstubAllEnvs() })
 
 describe('Inventory checker', () => {
+  it('preserves legacy recovery navigation until browser-local inventory is exported', async () => {
+    vi.stubEnv('BASE_URL', '/game-guide/mhwilds-inventory-checker/')
+    history.replaceState(null, '', '/game-guide/mhwilds-inventory-checker/?legacy=1')
+    setup()
+    await loaded()
+    expect(screen.getByRole('link', { name: 'MHWILDS 所持品チェッカー ホーム' })).toHaveAttribute('href', '/game-guide/mhwilds-inventory-checker/?legacy=1')
+    expect(screen.getByRole('link', { name: /スキルシミュレーター/ })).toHaveAttribute('href', '/game-guide/mhwilds-skill-sim/?legacy=1')
+    expect(screen.getByRole('button', { name: 'JSONをダウンロード' })).toBeEnabled()
+  })
+
+  it('links both tools at their configured subdomain routes', async () => {
+    vi.stubEnv('BASE_URL', '/inventory/')
+    vi.stubEnv('VITE_SIM_BASE_PATH', '/skill-sim/')
+    setup()
+    await loaded()
+    expect(screen.getByRole('link', { name: 'MHWILDS 所持品チェッカー ホーム' })).toHaveAttribute('href', '/inventory/')
+    expect(screen.getByRole('link', { name: /スキルシミュレーター/ })).toHaveAttribute('href', '/skill-sim/')
+  })
+
   it('saves rapid quantity updates in order and restores the same profile on reload', async () => {
     const { store, loader, unmount } = setup()
     await loaded()

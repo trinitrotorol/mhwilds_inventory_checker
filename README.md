@@ -122,6 +122,17 @@ test fixtureは `src/test/` に限り、本番へのimportを禁止します。
 `VITE_BASE_PATH=/preview/inventory/ ./scripts/npmw run build` で同一オリジンの絶対pathに
 変更できます。先頭・末尾は `/`、URL/query/fragment/バックスラッシュ/制御文字は禁止です。
 シミュレーターとカタログの既定パスはサービス標準のままです。
+`VITE_SIM_BASE_PATH` には同じ制約でシミュレーターの公開pathを指定できます。
+カタログはそのpath配下の `catalog/checker-catalog.json` を直接取得します。
+専用サブドメイン向けには、たとえば次のように両方を指定します。
+
+```sh
+VITE_BASE_PATH=/inventory/ VITE_SIM_BASE_PATH=/skill-sim/ ./scripts/npmw run build
+```
+
+`?legacy=1` で開いた場合は、チェッカーとシミュレーター間のリンクにも同じqueryを
+保持します。旧オリジンに残る所持品をJSONへ退避できるよう、配信側はこのqueryを
+持つ旧ページと旧カタログ・assetsを転送せず配信してください。
 
 `.venv/`、`.cache/`、`node_modules/`、`dist/`、`coverage/`、`.build/`、
 ブラウザ生成物、ユーザーデータ、秘密情報はcommitしません。
