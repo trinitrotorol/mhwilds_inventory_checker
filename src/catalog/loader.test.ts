@@ -5,7 +5,7 @@ import { syntheticCatalog } from '../test/domain-fixtures'
 
 const response = (value: unknown = syntheticCatalog(), status = 200, headers: Record<string, string> = { 'content-type': 'application/json' }) => new Response(JSON.stringify(value), { status, headers })
 const origin = 'https://test.example'
-afterEach(() => vi.useRealTimers())
+afterEach(() => { vi.useRealTimers(); vi.unstubAllEnvs(); vi.resetModules() })
 
 describe('production catalog loader', () => {
   it('loads strictly validated nonempty real data and sends no credentials', async () => {
@@ -13,6 +13,15 @@ describe('production catalog loader', () => {
     const loader = createCatalogLoader({ origin, fetch: fetcher })
     expect(await loader.load()).toEqual({ status: 'ready', catalog: syntheticCatalog() })
     expect(fetcher).toHaveBeenCalledWith('https://test.example/game-guide/mhwilds-skill-sim/catalog/checker-catalog.json', expect.objectContaining({ credentials: 'omit', redirect: 'error', cache: 'no-cache' }))
+  })
+  it('loads the configured subdomain catalog directly without following redirects', async () => {
+    vi.stubEnv('BASE_URL', '/inventory/')
+    vi.stubEnv('VITE_SIM_BASE_PATH', '/skill-sim/')
+    vi.resetModules()
+    const { createCatalogLoader: configuredLoader } = await import('./loader')
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(response())
+    expect((await configuredLoader({ origin: 'https://mhwilds.trinitrotorol.com', fetch: fetcher }).load()).status).toBe('ready')
+    expect(fetcher).toHaveBeenCalledWith('https://mhwilds.trinitrotorol.com/skill-sim/catalog/checker-catalog.json', expect.objectContaining({ credentials: 'omit', redirect: 'error' }))
   })
   it.each(['https://other.example/data.json', 'https://user:pass@test.example/data.json', 'javascript:alert(1)', '/data.json#fragment'])('rejects unsafe URL %s before any network call', async (url) => {
     const fetcher = vi.fn<typeof fetch>()

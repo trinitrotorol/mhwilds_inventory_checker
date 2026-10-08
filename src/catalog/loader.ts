@@ -1,7 +1,8 @@
 import { MAX_CATALOG_BYTES, parseBoundedJson, parseCatalog } from '../domain'
 import type { CheckerCatalog } from '../domain'
+import { serviceRoutes } from '../routes'
 
-export const DEFAULT_CATALOG_URL = '/game-guide/mhwilds-skill-sim/catalog/checker-catalog.json'
+export const DEFAULT_CATALOG_URL = serviceRoutes().catalog
 export interface CatalogLoadResult {
   status: 'ready' | 'stale' | 'error' | 'aborted'
   catalog: CheckerCatalog | null

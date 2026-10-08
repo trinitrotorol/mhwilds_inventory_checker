@@ -2,10 +2,11 @@ import react from '@vitejs/plugin-react'
 import { loadEnv } from 'vite'
 import { defineConfig } from 'vitest/config'
 
-import { resolveBasePath } from './config/basePath'
+import { resolveBasePath, resolveSimBasePath } from './config/basePath'
 
 export default defineConfig(({ mode }) => {
   const environment = loadEnv(mode, process.cwd())
+  resolveSimBasePath(environment.VITE_SIM_BASE_PATH)
 
   return {
     base: resolveBasePath(environment.VITE_BASE_PATH),
