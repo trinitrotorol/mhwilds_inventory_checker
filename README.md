@@ -137,3 +137,19 @@ VITE_BASE_PATH=/inventory/ VITE_SIM_BASE_PATH=/skill-sim/ ./scripts/npmw run bui
 `.venv/`、`.cache/`、`node_modules/`、`dist/`、`coverage/`、`.build/`、
 ブラウザ生成物、ユーザーデータ、秘密情報はcommitしません。
 commitは [COMMIT_CONVENTION.md](COMMIT_CONVENTION.md) に従います。
+
+## 表示言語
+
+ヘッダーの `言語 / Language` で日本語・英語を選択します。既定値は日本語です。
+選択は `mhwilds.ui.locale.v1` に `ja` / `en` として保存し、同じオリジンの
+シミュレーターと共有します。変更時は `mhwilds:locale-change` CustomEvent の
+`detail` に言語を渡します。他タブのstorage変更も反映します。
+
+英語名は `VITE_SIM_BASE_PATH` 配下の `locales/en.json` から取得します。
+形式は `{schema_version:1, locale:"en", names:{skills:{ID:"Name"}, equipment:{ID:"Name"}, decorations:{ID:"Name"}}}`
+です。同一オリジン・JSON形式・サイズを検証し、credential送信とリダイレクト追従を
+禁止します。取得失敗や未収録のIDでは元の名前を表示します。
+表示と名前検索のみを切り替え、安定ID・カタログrevision・ユーザーの護石ラベル・
+保存プロフィール・JSON形式は変更しません。言語設定の保存が拒否されても、その画面での切替は利用できます。
+翻訳取得後は日本語名・英語名・IDのいずれでも検索できます。言語切替や他タブからの
+設定反映で、名前の絞り込みに一致する行や入力中の数量を失わないようにしています。
